@@ -798,7 +798,6 @@
 
             <div class="d-flex justify-content-end gap-2 mt-4">
               <button class="btn btn-main" id="updateStructure">Aplicar cambios</button>
-              <button class="btn btn-soft" data-go="niveles">Continuar</button>
             </div>
           </div>
         </div>
@@ -1333,8 +1332,7 @@ Calificación final: ${fmt(finalGrade)} / ${fmt(state.maxGrade)}`;
     $("loadExample").addEventListener("click", loadExample);
     $("resetForm").addEventListener("click", resetForm);
     $("maxGrade").addEventListener("input", calculate);
-    $("criteriaCount").addEventListener("change", updateStructure);
-    $("levelCount").addEventListener("change", updateStructure);
+    // Los cambios en cantidad de criterios o niveles solo se aplican al presionar "Aplicar cambios".
 
     $("searchCriteria").addEventListener("input", (event) => {
       state.query = event.target.value;
