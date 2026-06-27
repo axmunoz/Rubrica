@@ -1,0 +1,1349 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora de rúbrica | Escala 0 a 5</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --primary:#006f68;
+      --primary-dark:#005b56;
+      --primary-soft:#eaf5f3;
+      --ink:#233143;
+      --muted:#6a7787;
+      --border:#d9e3ea;
+      --surface:#ffffff;
+      --body:#f5f7f9;
+      --row:#e8fbf6;
+      --shadow:0 6px 22px rgba(31,45,61,.07);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      min-height:100vh;
+      margin:0;
+      background:var(--body);
+      color:var(--ink);
+      font-family:"Segoe UI", Roboto, Arial, sans-serif;
+      font-size:15px;
+    }
+
+    .layout{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:260px minmax(0, 1fr);
+    }
+
+    .sidebar{
+      background:#fff;
+      border-right:1px solid var(--border);
+      padding:22px 16px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+    }
+
+    .brand{
+      display:flex;
+      gap:11px;
+      align-items:center;
+      padding:6px 8px 20px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:20px;
+    }
+
+    .brand-icon{
+      width:38px;
+      height:38px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      background:var(--primary);
+      color:#fff;
+      flex:0 0 auto;
+    }
+
+    .brand-title{
+      font-size:1.08rem;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin:0;
+    }
+
+    .brand-subtitle{
+      display:block;
+      color:var(--muted);
+      font-size:.75rem;
+      margin-top:5px;
+      font-weight:600;
+    }
+
+    .menu-title{
+      color:#8a96a4;
+      font-size:.7rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      padding:0 10px;
+      margin:20px 0 8px;
+    }
+
+    .side-link{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:10px;
+      color:#4e5d6d;
+      text-decoration:none;
+      font-weight:700;
+      border:1px solid transparent;
+      margin-bottom:4px;
+    }
+
+    .side-link:hover{
+      background:#f6faf9;
+      color:var(--primary);
+    }
+
+    .side-link.active{
+      background:var(--primary-soft);
+      border-color:#cce4e0;
+      color:var(--primary);
+    }
+
+    .side-link i{
+      width:20px;
+      text-align:center;
+    }
+
+    .side-note{
+      margin-top:26px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#f9fbfc;
+      color:#627083;
+      font-size:.83rem;
+      line-height:1.45;
+    }
+
+    .main{
+      padding:24px 28px 40px;
+      min-width:0;
+    }
+
+    .topbar{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      padding:20px 22px;
+      margin-bottom:20px;
+      display:grid;
+      grid-template-columns:1fr 190px;
+      gap:20px;
+      align-items:center;
+    }
+
+    .kicker{
+      color:var(--primary);
+      font-size:.76rem;
+      font-weight:800;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
+    .page-title{
+      margin:0;
+      font-size:1.62rem;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .page-copy{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.5;
+      max-width:780px;
+      font-size:.95rem;
+    }
+
+    .grade-box{
+      border:1px solid #cfe0dd;
+      background:#f8fcfb;
+      border-radius:12px;
+      padding:14px 15px;
+    }
+
+    .grade-label{
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+    }
+
+    .grade-value{
+      margin:5px 0 2px;
+      color:var(--primary);
+      font-weight:850;
+      font-size:2.1rem;
+      line-height:1;
+      letter-spacing:-.05em;
+    }
+
+    .grade-note{
+      margin:0;
+      color:#536171;
+      font-size:.82rem;
+    }
+
+    .view{display:none}
+    .view.active{display:block}
+
+    .module{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .module-header{
+      padding:18px 20px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+    }
+
+    .module-header h2{
+      margin:0;
+      font-size:1.18rem;
+      font-weight:800;
+      letter-spacing:-.015em;
+    }
+
+    .module-header p{
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.45;
+    }
+
+    .module-body{
+      padding:20px;
+    }
+
+    .form-label{
+      font-weight:750;
+      color:#34465a;
+      font-size:.82rem;
+      margin-bottom:6px;
+    }
+
+    .form-control,
+    .form-select{
+      border-color:#cfd9e4;
+      border-radius:9px;
+      min-height:40px;
+      font-size:.92rem;
+    }
+
+    textarea.form-control{
+      line-height:1.45;
+    }
+
+    .auto-grow{
+      min-height:42px;
+      overflow:hidden !important;
+      resize:none;
+      scrollbar-width:none;
+    }
+
+    .auto-grow::-webkit-scrollbar{
+      display:none;
+    }
+
+    .description-field{
+      min-height:70px;
+    }
+
+    .definition-field{
+      min-height:42px;
+    }
+
+    .form-control:focus,
+    .form-select:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 .18rem rgba(0,111,104,.12);
+    }
+
+    .btn-main{
+      background:var(--primary);
+      border-color:var(--primary);
+      color:#fff;
+      border-radius:9px;
+      font-weight:750;
+      min-height:40px;
+      padding-left:14px;
+      padding-right:14px;
+    }
+
+    .btn-main:hover{
+      background:var(--primary-dark);
+      border-color:var(--primary-dark);
+      color:#fff;
+    }
+
+    .btn-soft{
+      background:var(--primary-soft);
+      color:var(--primary);
+      border:1px solid #cce4e0;
+      border-radius:9px;
+      font-weight:750;
+      min-height:40px;
+    }
+
+    .btn-soft:hover{
+      background:#dfeeea;
+      color:var(--primary);
+    }
+
+    .btn-outline-clean{
+      border:1px solid #ccd8e2;
+      background:#fff;
+      color:#445364;
+      border-radius:9px;
+      font-weight:750;
+      min-height:40px;
+    }
+
+    .hint{
+      background:#f9fbfc;
+      border:1px solid var(--border);
+      border-left:4px solid var(--primary);
+      border-radius:10px;
+      padding:12px 14px;
+      color:#526273;
+      line-height:1.45;
+      font-size:.89rem;
+    }
+
+    .level-card{
+      height:100%;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fbfcfd;
+    }
+
+    .level-card-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .badge-clean{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 8px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:var(--primary);
+      font-size:.74rem;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    /* Acordeón de criterios */
+    .criteria-accordion{
+      display:grid;
+      gap:10px;
+    }
+
+    .criterion-accordion{
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .criterion-toggle{
+      width:100%;
+      border:0;
+      background:#f7fbfa;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      text-align:left;
+      color:var(--ink);
+    }
+
+    .criterion-toggle:hover{
+      background:#f0f8f6;
+    }
+
+    .criterion-toggle-title{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+
+    .criterion-toggle-title strong{
+      color:var(--primary);
+      font-size:1rem;
+      line-height:1.25;
+      font-weight:800;
+    }
+
+    .criterion-toggle-title span{
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:600;
+    }
+
+    .criterion-toggle .chevron{
+      transition:transform .2s ease;
+      color:var(--primary);
+      flex:0 0 auto;
+    }
+
+    .criterion-toggle[aria-expanded="true"] .chevron{
+      transform:rotate(180deg);
+    }
+
+    .criterion-content{
+      border-top:1px solid var(--border);
+      padding:16px;
+    }
+
+    .criterion-grid{
+      display:grid;
+      grid-template-columns:310px minmax(0, 1fr);
+      gap:14px;
+      align-items:start;
+    }
+
+    .definition-table{
+      border:1px solid var(--border);
+      border-radius:10px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .definition-row{
+      display:grid;
+      grid-template-columns:180px minmax(0, 1fr);
+      gap:0;
+      border-bottom:1px solid var(--border);
+    }
+
+    .definition-row:last-child{border-bottom:0}
+
+    .definition-label{
+      padding:12px;
+      background:#f8fbfb;
+      border-right:1px solid var(--border);
+      font-weight:750;
+      color:#34465a;
+      font-size:.88rem;
+    }
+
+    .definition-label span{
+      display:block;
+      color:var(--primary);
+      font-size:.78rem;
+      margin-top:3px;
+      font-weight:800;
+    }
+
+    .definition-cell{
+      padding:10px;
+    }
+
+    .toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+
+    .filter-button{
+      height:44px;
+      min-width:120px;
+      border:0;
+      border-radius:9px;
+      background:var(--primary);
+      color:#fff;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .search-control{
+      width:min(360px, 100%);
+      height:44px;
+      display:flex;
+      border:1px solid #cfd9e4;
+      border-radius:10px;
+      background:#fff;
+      overflow:hidden;
+    }
+
+    .search-control input{
+      flex:1;
+      border:0;
+      outline:0;
+      padding:0 14px;
+      color:var(--ink);
+      font-size:.92rem;
+    }
+
+    .search-control button{
+      margin:4px;
+      width:70px;
+      border:0;
+      border-radius:8px;
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .table-box{
+      border:1px solid #cfd9e4;
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .table{
+      min-width:960px;
+      margin:0;
+      font-size:.92rem;
+    }
+
+    .table th{
+      background:#edf2f6;
+      color:#2b3b50;
+      font-weight:800;
+      border-color:#d4dfe8;
+      padding:12px;
+      white-space:nowrap;
+    }
+
+    .table td{
+      border-color:#dce5ed;
+      padding:12px;
+      vertical-align:middle;
+    }
+
+    .table tbody tr:nth-child(even){
+      background:var(--row);
+    }
+
+    .action-square{
+      width:42px;
+      height:38px;
+      border:0;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .criterion-title{
+      margin-bottom:5px;
+      font-weight:800;
+      color:#223246;
+    }
+
+    .criterion-description{
+      color:#526273;
+      line-height:1.42;
+      font-size:.89rem;
+      max-width:650px;
+    }
+
+    .level-option{
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      min-width:124px;
+      cursor:pointer;
+    }
+
+    .level-option input{margin-top:4px}
+
+    .level-option strong{
+      display:block;
+      color:#223246;
+      font-size:.9rem;
+    }
+
+    .level-option small{
+      color:#647389;
+      font-weight:700;
+    }
+
+    .table-footer{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      border-top:1px solid #dce5ed;
+      padding:10px 12px;
+      background:#fbfcfd;
+      color:#5f7087;
+      font-size:.9rem;
+      flex-wrap:wrap;
+    }
+
+    .calc-grid{
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .summary{
+      background:#163331;
+      color:#ecfffb;
+      border-radius:12px;
+      padding:16px;
+      min-height:260px;
+    }
+
+    .summary h3{
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:800;
+    }
+
+    .summary-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:9px 0;
+      font-size:.9rem;
+    }
+
+    .summary-row span{opacity:.88}
+    .summary-row strong{white-space:nowrap}
+
+    .formula-panel{
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fbfcfd;
+      padding:16px;
+    }
+
+    .formula-title{
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .formula{
+      font-family:Consolas, "Liberation Mono", monospace;
+      background:#fff;
+      border:1px dashed #b9d4cf;
+      color:#173f39;
+      border-radius:10px;
+      padding:14px;
+      line-height:1.65;
+      white-space:pre-wrap;
+      font-size:.88rem;
+      margin:10px 0;
+    }
+
+    .result-line{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:10px 12px;
+      background:#fff;
+      margin-bottom:8px;
+      font-size:.9rem;
+    }
+
+    .result-line span{color:#617189}
+    .result-line strong{color:var(--primary)}
+
+    @media (max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      .main{padding:18px}
+      .topbar{grid-template-columns:1fr}
+      .criterion-grid{grid-template-columns:1fr}
+      .calc-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:760px){
+      .main{padding:14px}
+      .module-header{display:block}
+      .module-header .d-flex{margin-top:12px}
+      .definition-row{grid-template-columns:1fr}
+      .definition-label{border-right:0;border-bottom:1px solid var(--border)}
+      .toolbar{align-items:stretch}
+      .filter-button,.search-control{width:100%}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon"><i class="bi bi-clipboard-check"></i></div>
+        <div>
+          <p class="brand-title">RubriCalc</p>
+          <span class="brand-subtitle">Escala de evaluación</span>
+        </div>
+      </div>
+
+      <div class="menu-title">Configuración</div>
+      <nav>
+        <a href="#" class="side-link active" data-panel="general"><i class="bi bi-sliders"></i>Ajustes generales</a>
+        <a href="#" class="side-link" data-panel="niveles"><i class="bi bi-layers"></i>Niveles</a>
+        <a href="#" class="side-link" data-panel="criterios"><i class="bi bi-list-check"></i>Criterios</a>
+      </nav>
+
+      <div class="menu-title">Evaluación</div>
+      <nav>
+        <a href="#" class="side-link" data-panel="rejilla"><i class="bi bi-table"></i>Rejilla</a>
+        <a href="#" class="side-link" data-panel="resultado"><i class="bi bi-calculator"></i>Resultado</a>
+      </nav>
+
+      <div class="side-note">
+        Complete cada módulo en orden. La nota se calcula con los puntajes definidos en los niveles.
+      </div>
+    </aside>
+
+    <section class="main">
+      <section class="topbar">
+        <div>
+          <div class="kicker">Calculadora de rúbrica</div>
+          <h1 class="page-title">Evaluación por criterios</h1>
+          <p class="page-copy">
+            Defina criterios, niveles y puntajes. Seleccione la valoración correspondiente para obtener la calificación final.
+          </p>
+        </div>
+
+        <div class="grade-box">
+          <div class="grade-label">Nota final</div>
+          <div class="grade-value" id="scoreTop">0.00</div>
+          <p class="grade-note" id="scoreText">Sobre 5.00 puntos</p>
+        </div>
+      </section>
+
+      <section class="view active" id="general">
+        <div class="module">
+          <div class="module-header">
+            <div>
+              <h2>Ajustes generales</h2>
+              <p>Defina la estructura de la rúbrica y la calificación máxima.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-soft" id="loadExample"><i class="bi bi-arrow-clockwise me-1"></i>Cargar ejemplo</button>
+              <button class="btn btn-outline-clean" id="resetForm">Limpiar</button>
+            </div>
+          </div>
+
+          <div class="module-body">
+            <div class="row g-3">
+              <div class="col-lg-6">
+                <label class="form-label" for="activityName">Nombre de la rúbrica</label>
+                <input class="form-control" id="activityName" value="Rúbrica para actividad de cálculo matemático">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="criteriaCount">Criterios</label>
+                <input class="form-control" id="criteriaCount" type="number" min="1" max="10" value="3">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="levelCount">Niveles</label>
+                <input class="form-control" id="levelCount" type="number" min="2" max="6" value="3">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="maxGrade">Nota máxima</label>
+                <input class="form-control" id="maxGrade" type="number" min="1" step="0.1" value="5">
+              </div>
+            </div>
+
+            <div class="hint mt-4">
+              Valores iniciales: 3 criterios, 3 niveles y nota máxima de 5.
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button class="btn btn-main" id="updateStructure">Aplicar cambios</button>
+              <button class="btn btn-soft" data-go="niveles">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="niveles">
+        <div class="module">
+          <div class="module-header">
+            <div>
+              <h2>Niveles de desempeño</h2>
+              <p>Asigne el nombre del nivel y su puntaje.</p>
+            </div>
+            <button class="btn btn-main" data-go="criterios">Continuar</button>
+          </div>
+
+          <div class="module-body">
+            <div class="row g-3" id="levelsContainer"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="criterios">
+        <div class="module">
+          <div class="module-header">
+            <div>
+              <h2>Criterios de evaluación</h2>
+              <p>Cada criterio se muestra cerrado. Abra el que desea editar.</p>
+            </div>
+            <button class="btn btn-main" data-go="rejilla">Ir a la rejilla</button>
+          </div>
+
+          <div class="module-body">
+            <div id="criteriaContainer" class="criteria-accordion"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="rejilla">
+        <div class="module">
+          <div class="module-header">
+            <div>
+              <h2>Rejilla de evaluación</h2>
+              <p>Seleccione el nivel alcanzado por cada criterio.</p>
+            </div>
+            <button class="btn btn-main" data-go="resultado">Ver resultado</button>
+          </div>
+
+          <div class="module-body">
+            <div class="toolbar">
+              <button class="filter-button" type="button"><i class="bi bi-funnel-fill"></i>Filtrar</button>
+              <div class="search-control">
+                <input id="searchCriteria" type="search" placeholder="Buscar criterio">
+                <button type="button" aria-label="Buscar"><i class="bi bi-search"></i></button>
+              </div>
+            </div>
+
+            <div class="table-box table-responsive">
+              <table class="table align-middle" id="rubricTable"></table>
+              <div class="table-footer">
+                <div>Mostrar <select class="form-select form-select-sm d-inline-block w-auto mx-1"><option>10 por página</option></select></div>
+                <div id="rowCounter">1-3 de 3</div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button class="btn btn-main" data-go="resultado">Calcular</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="resultado">
+        <div class="module">
+          <div class="module-header">
+            <div>
+              <h2>Resultado</h2>
+              <p>Detalle del procedimiento aplicado para obtener la calificación.</p>
+            </div>
+            <button class="btn btn-soft" data-go="rejilla">Volver a la rejilla</button>
+          </div>
+
+          <div class="module-body">
+            <div class="calc-grid">
+              <div class="summary">
+                <h3>Resumen de puntos</h3>
+                <div id="stepSummary"></div>
+              </div>
+
+              <div class="formula-panel">
+                <div class="formula-title">Procedimiento de cálculo</div>
+                <div class="formula" id="formulaText">Seleccione un nivel por cada criterio para generar el cálculo.</div>
+                <div id="resultList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const example = {
+      levels:[
+        {name:"Insuficiente", points:0},
+        {name:"Regular", points:3},
+        {name:"Excelente", points:5}
+      ],
+      criteria:[
+        {
+          name:"Comprensión del problema",
+          description:"Evalúa si el estudiante comprende adecuadamente la situación planteada, identifica los datos importantes del problema y reconoce qué procedimiento matemático debe aplicar para resolverlo.",
+          definitions:[
+            "No identifica los datos principales del problema o no demuestra comprensión de la situación planteada.",
+            "Identifica algunos datos importantes, pero presenta dudas en la interpretación del problema o en la selección del procedimiento adecuado.",
+            "Identifica correctamente todos los datos del problema, comprende la situación planteada y reconoce con claridad el procedimiento matemático que debe aplicar."
+          ]
+        },
+        {
+          name:"Desarrollo del procedimiento",
+          description:"Evalúa si el estudiante realiza el procedimiento de forma ordenada, aplica correctamente las operaciones necesarias y evidencia un proceso lógico para llegar a la respuesta.",
+          definitions:[
+            "No desarrolla el procedimiento de forma adecuada, presenta errores graves o no evidencia un proceso lógico para resolver el problema.",
+            "Presenta un procedimiento parcialmente correcto, pero omite algunos pasos, tiene errores menores o falta claridad en el desarrollo.",
+            "Desarrolla el procedimiento de manera ordenada, completa y correcta. Aplica adecuadamente las operaciones y muestra los pasos necesarios para llegar al resultado."
+          ]
+        },
+        {
+          name:"Resultado e interpretación",
+          description:"Evalúa si el estudiante presenta el resultado final correctamente, usa la unidad correspondiente cuando aplica y explica el significado de la respuesta dentro del contexto del problema.",
+          definitions:[
+            "Presenta un resultado incorrecto, incompleto o sin relación con el problema planteado.",
+            "Presenta un resultado aproximado o parcialmente correcto, pero le falta claridad, unidad de medida o una mejor interpretación del resultado.",
+            "Presenta el resultado correcto, utiliza la unidad correspondiente y explica de forma clara qué significa la respuesta dentro del contexto del problema."
+          ]
+        }
+      ],
+      selected:[0,1,1]
+    };
+
+    let state = {
+      maxGrade:5,
+      levels:structuredClone(example.levels),
+      criteria:structuredClone(example.criteria),
+      selected:[0,1,1],
+      query:""
+    };
+
+    function openPanel(id){
+      document.querySelectorAll(".view").forEach(panel => panel.classList.toggle("active", panel.id === id));
+      document.querySelectorAll(".side-link").forEach(link => link.classList.toggle("active", link.dataset.panel === id));
+      window.scrollTo({top:0, behavior:"smooth"});
+      setTimeout(resizeAllTextareas, 80);
+    }
+
+    document.addEventListener("click", (event) => {
+      const panelLink = event.target.closest("[data-panel]");
+      if(panelLink){
+        event.preventDefault();
+        openPanel(panelLink.dataset.panel);
+      }
+
+      const goLink = event.target.closest("[data-go]");
+      if(goLink){
+        event.preventDefault();
+        openPanel(goLink.dataset.go);
+      }
+    });
+
+    function toNumber(value, fallback = 0){
+      const n = Number(String(value).replace(",", "."));
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function fmt(n){
+      return toNumber(n).toFixed(2);
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function autoResize(textarea){
+      if(!textarea) return;
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    function resizeAllTextareas(){
+      document.querySelectorAll("textarea.auto-grow").forEach(autoResize);
+    }
+
+    function attachAutoResize(){
+      document.querySelectorAll("textarea.auto-grow").forEach(textarea => {
+        autoResize(textarea);
+        textarea.addEventListener("input", () => autoResize(textarea));
+      });
+    }
+
+    function capture(){
+      state.maxGrade = Math.max(0.1, toNumber($("maxGrade").value, 5));
+
+      state.levels = state.levels.map((level, i) => ({
+        name: $(`levelName_${i}`)?.value.trim() || `Nivel ${i + 1}`,
+        points: toNumber($(`levelPoints_${i}`)?.value, 0)
+      }));
+
+      state.criteria = state.criteria.map((criterion, i) => ({
+        name: $(`criterionName_${i}`)?.value.trim() || `Criterio ${i + 1}`,
+        description: $(`criterionDesc_${i}`)?.value.trim() || "",
+        definitions: state.levels.map((_, j) => $(`definition_${i}_${j}`)?.value.trim() || "")
+      }));
+    }
+
+    function makeDefaultLevels(count){
+      if(count === 3) return structuredClone(example.levels);
+      const maxGrade = Math.max(0.1, toNumber($("maxGrade").value, 5));
+      return Array.from({length:count}, (_, i) => {
+        const points = count === 1 ? maxGrade : (maxGrade / (count - 1)) * i;
+        return {
+          name: i === 0 ? "Nivel bajo" : i === count - 1 ? "Nivel alto" : `Nivel ${i + 1}`,
+          points:Number(points.toFixed(2))
+        };
+      });
+    }
+
+    function makeDefaultCriteria(count, levelCount){
+      return Array.from({length:count}, (_, i) => {
+        const old = state.criteria[i];
+        return {
+          name: old?.name || example.criteria[i]?.name || `Criterio ${i + 1}`,
+          description: old?.description || example.criteria[i]?.description || "Describa qué se evalúa en este criterio.",
+          definitions:Array.from({length:levelCount}, (_, j) =>
+            old?.definitions?.[j] || example.criteria[i]?.definitions?.[j] || "Escriba la definición de este nivel."
+          )
+        };
+      });
+    }
+
+    function updateStructure(){
+      capture();
+
+      const criteriaCount = Math.max(1, Math.min(10, parseInt($("criteriaCount").value || "3", 10)));
+      const levelCount = Math.max(2, Math.min(6, parseInt($("levelCount").value || "3", 10)));
+      $("criteriaCount").value = criteriaCount;
+      $("levelCount").value = levelCount;
+
+      const oldLevels = structuredClone(state.levels);
+      if(oldLevels.length === levelCount){
+        state.levels = oldLevels;
+      }else if(levelCount === 3){
+        state.levels = structuredClone(example.levels);
+      }else{
+        const defaults = makeDefaultLevels(levelCount);
+        state.levels = Array.from({length:levelCount}, (_, i) => oldLevels[i] || defaults[i]);
+      }
+
+      state.criteria = makeDefaultCriteria(criteriaCount, levelCount);
+      state.selected = Array.from({length:criteriaCount}, (_, i) => {
+        const current = state.selected[i];
+        return Number.isInteger(current) && current < levelCount ? current : 0;
+      });
+
+      renderAll();
+      openPanel("niveles");
+    }
+
+    function renderLevels(){
+      const container = $("levelsContainer");
+      container.innerHTML = state.levels.map((level, i) => `
+        <div class="col-md-6 col-xl-4">
+          <div class="level-card">
+            <div class="level-card-head">
+              <span class="badge-clean">Nivel ${i + 1}</span>
+              <span class="badge-clean">${fmt(level.points)} puntos</span>
+            </div>
+            <label class="form-label" for="levelName_${i}">Nombre</label>
+            <input class="form-control mb-3" id="levelName_${i}" value="${escapeHtml(level.name)}">
+            <label class="form-label" for="levelPoints_${i}">Puntaje</label>
+            <input class="form-control" id="levelPoints_${i}" type="number" step="0.1" value="${escapeHtml(level.points)}">
+          </div>
+        </div>
+      `).join("");
+
+      state.levels.forEach((_, i) => {
+        $(`levelName_${i}`).addEventListener("input", () => { capture(); renderRubric(); calculate(); });
+        $(`levelPoints_${i}`).addEventListener("input", () => { capture(); renderRubric(); calculate(); });
+      });
+    }
+
+    function renderCriteria(){
+      const container = $("criteriaContainer");
+      container.innerHTML = state.criteria.map((criterion, i) => `
+        <article class="criterion-accordion">
+          <button class="criterion-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#criterionPanel_${i}" aria-expanded="false" aria-controls="criterionPanel_${i}">
+            <span class="criterion-toggle-title">
+              <strong id="criterionHeading_${i}">Criterio ${i + 1}: ${escapeHtml(criterion.name)}</strong>
+              <span>${state.levels.length} niveles configurados</span>
+            </span>
+            <i class="bi bi-chevron-down chevron"></i>
+          </button>
+
+          <div class="collapse" id="criterionPanel_${i}">
+            <div class="criterion-content">
+              <div class="criterion-grid">
+                <div>
+                  <label class="form-label" for="criterionName_${i}">Nombre del criterio</label>
+                  <input class="form-control mb-3" id="criterionName_${i}" value="${escapeHtml(criterion.name)}">
+                  <label class="form-label" for="criterionDesc_${i}">Descripción</label>
+                  <textarea class="form-control auto-grow description-field" id="criterionDesc_${i}">${escapeHtml(criterion.description)}</textarea>
+                </div>
+                <div class="definition-table">
+                  ${state.levels.map((level, j) => `
+                    <div class="definition-row">
+                      <div class="definition-label">
+                        ${escapeHtml(level.name)}
+                        <span>${fmt(level.points)} puntos</span>
+                      </div>
+                      <div class="definition-cell">
+                        <textarea class="form-control auto-grow definition-field" id="definition_${i}_${j}">${escapeHtml(criterion.definitions[j] || "")}</textarea>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+
+      state.criteria.forEach((_, i) => {
+        const nameInput = $(`criterionName_${i}`);
+        const descriptionInput = $(`criterionDesc_${i}`);
+
+        nameInput.addEventListener("input", () => {
+          capture();
+          $(`criterionHeading_${i}`).textContent = `Criterio ${i + 1}: ${state.criteria[i].name}`;
+          renderRubric();
+          calculate();
+        });
+
+        descriptionInput.addEventListener("input", () => {
+          capture();
+          renderRubric();
+          calculate();
+        });
+
+        state.levels.forEach((_, j) => {
+          $(`definition_${i}_${j}`).addEventListener("input", () => {
+            capture();
+            calculate();
+          });
+        });
+
+        const panel = $(`criterionPanel_${i}`);
+        panel.addEventListener("shown.bs.collapse", () => setTimeout(resizeAllTextareas, 50));
+      });
+
+      attachAutoResize();
+    }
+
+    function renderRubric(){
+      const table = $("rubricTable");
+      const query = (state.query || "").toLowerCase().trim();
+
+      const visible = state.criteria
+        .map((criterion, index) => ({criterion, index}))
+        .filter(item => {
+          if(!query) return true;
+          return (item.criterion.name + " " + item.criterion.description).toLowerCase().includes(query);
+        });
+
+      const head = `
+        <thead>
+          <tr>
+            <th style="width:70px">Ver</th>
+            <th style="width:70px">Editar</th>
+            <th style="min-width:360px">Criterio <i class="bi bi-arrow-down ms-1"></i></th>
+            ${state.levels.map(level => `<th>${escapeHtml(level.name)}<br><small>${fmt(level.points)} puntos</small></th>`).join("")}
+          </tr>
+        </thead>
+      `;
+
+      const body = `
+        <tbody>
+          ${visible.map(({criterion, index}) => `
+            <tr>
+              <td><button class="action-square" type="button" data-go="resultado" aria-label="Ver resultado"><i class="bi bi-eye"></i></button></td>
+              <td><button class="action-square" type="button" data-go="criterios" aria-label="Editar criterio"><i class="bi bi-pencil-square"></i></button></td>
+              <td>
+                <div class="criterion-title">${escapeHtml(criterion.name)}</div>
+                <div class="criterion-description">${escapeHtml(criterion.description)}</div>
+              </td>
+              ${state.levels.map((level, j) => `
+                <td>
+                  <label class="level-option">
+                    <input class="form-check-input" type="radio" name="criterion_${index}" value="${j}" ${state.selected[index] === j ? "checked" : ""}>
+                    <span>
+                      <strong>${escapeHtml(level.name)}</strong>
+                      <small>${fmt(level.points)} puntos</small>
+                    </span>
+                  </label>
+                </td>
+              `).join("")}
+            </tr>
+          `).join("") || `<tr><td colspan="${state.levels.length + 3}" class="text-center text-muted py-4">No se encontraron criterios.</td></tr>`}
+        </tbody>
+      `;
+
+      table.innerHTML = head + body;
+      $("rowCounter").textContent = visible.length ? `1-${visible.length} de ${state.criteria.length}` : `0 de ${state.criteria.length}`;
+
+      state.criteria.forEach((_, i) => {
+        document.querySelectorAll(`input[name="criterion_${i}"]`).forEach(input => {
+          input.addEventListener("change", () => {
+            state.selected[i] = Number(input.value);
+            calculate();
+          });
+        });
+      });
+    }
+
+    function calculate(){
+      capture();
+
+      let obtained = 0;
+      let maxPossible = 0;
+      const lines = [];
+
+      state.criteria.forEach((criterion, i) => {
+        const selectedIndex = state.selected[i] ?? 0;
+        const selectedLevel = state.levels[selectedIndex] || state.levels[0];
+        const points = toNumber(selectedLevel?.points, 0);
+        const maxForCriterion = Math.max(...state.levels.map(l => toNumber(l.points, 0)));
+
+        obtained += points;
+        maxPossible += maxForCriterion;
+
+        lines.push({
+          criterion:criterion.name,
+          level:selectedLevel?.name || "Sin nivel",
+          points,
+          max:maxForCriterion
+        });
+      });
+
+      const finalGrade = maxPossible > 0 ? (obtained / maxPossible) * state.maxGrade : 0;
+
+      $("scoreTop").textContent = fmt(finalGrade);
+      $("scoreText").textContent = `Sobre ${fmt(state.maxGrade)} puntos`;
+
+      $("stepSummary").innerHTML = lines.map(line => `
+        <div class="summary-row">
+          <span>${escapeHtml(line.criterion)} · ${escapeHtml(line.level)}</span>
+          <strong>${fmt(line.points)}</strong>
+        </div>
+      `).join("") + `
+        <div class="summary-row"><span>Puntaje obtenido</span><strong>${fmt(obtained)}</strong></div>
+        <div class="summary-row"><span>Puntaje máximo posible</span><strong>${fmt(maxPossible)}</strong></div>
+      `;
+
+      $("formulaText").textContent =
+`1. Puntaje obtenido:
+   ${lines.map(line => fmt(line.points)).join(" + ")} = ${fmt(obtained)}
+
+2. Puntaje máximo posible:
+   ${lines.map(line => fmt(line.max)).join(" + ")} = ${fmt(maxPossible)}
+
+3. Conversión a la escala definida:
+   (${fmt(obtained)} ÷ ${fmt(maxPossible)}) × ${fmt(state.maxGrade)} = ${fmt(finalGrade)}
+
+Calificación final: ${fmt(finalGrade)} / ${fmt(state.maxGrade)}`;
+
+      $("resultList").innerHTML = `
+        <div class="result-line"><span>Puntaje obtenido</span><strong>${fmt(obtained)}</strong></div>
+        <div class="result-line"><span>Puntaje máximo</span><strong>${fmt(maxPossible)}</strong></div>
+        <div class="result-line"><span>Calificación final</span><strong>${fmt(finalGrade)} / ${fmt(state.maxGrade)}</strong></div>
+      `;
+
+      setTimeout(resizeAllTextareas, 30);
+    }
+
+    function renderAll(){
+      renderLevels();
+      renderCriteria();
+      renderRubric();
+      calculate();
+      setTimeout(resizeAllTextareas, 100);
+    }
+
+    function loadExample(){
+      $("criteriaCount").value = 3;
+      $("levelCount").value = 3;
+      $("maxGrade").value = 5;
+      $("activityName").value = "Rúbrica para actividad de cálculo matemático";
+      state = {
+        maxGrade:5,
+        levels:structuredClone(example.levels),
+        criteria:structuredClone(example.criteria),
+        selected:[0,1,1],
+        query:""
+      };
+      $("searchCriteria").value = "";
+      renderAll();
+      openPanel("rejilla");
+    }
+
+    function resetForm(){
+      $("criteriaCount").value = 3;
+      $("levelCount").value = 3;
+      $("maxGrade").value = 5;
+      $("activityName").value = "Nueva rúbrica";
+      state = {
+        maxGrade:5,
+        levels:structuredClone(example.levels),
+        criteria:makeDefaultCriteria(3, 3),
+        selected:[0,0,0],
+        query:""
+      };
+      $("searchCriteria").value = "";
+      renderAll();
+      openPanel("general");
+    }
+
+    $("updateStructure").addEventListener("click", updateStructure);
+    $("loadExample").addEventListener("click", loadExample);
+    $("resetForm").addEventListener("click", resetForm);
+    $("maxGrade").addEventListener("input", calculate);
+    $("criteriaCount").addEventListener("change", updateStructure);
+    $("levelCount").addEventListener("change", updateStructure);
+
+    $("searchCriteria").addEventListener("input", (event) => {
+      state.query = event.target.value;
+      renderRubric();
+    });
+
+    renderAll();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
